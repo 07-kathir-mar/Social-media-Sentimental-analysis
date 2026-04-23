@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   alerts,
   brandComparisonBase,
@@ -15,7 +15,7 @@ import { summarizeRange } from '../utils/helpers';
 function useMockData() {
   const [selectedPoint, setSelectedPoint] = useState(sentimentTimeline[4]);
 
-  const compareBrand = (brandName) => {
+  const compareBrand = useCallback((brandName) => {
     const normalized = brandName?.trim() || 'Competitor Brand';
     const modifier = normalized.length % 7;
 
@@ -38,9 +38,9 @@ function useMockData() {
         `Benchmark ${normalized}'s creator partnerships and replicate the formats that drive positive volume.`,
       ],
     };
-  };
+  }, []);
 
-  const simulateScenario = (scenario) => {
+  const simulateScenario = useCallback((scenario) => {
     const baseLift = Math.min(18, Math.max(6, scenario.trim().length % 20));
     const impact = forecastPredictions.map((entry, index) => ({
       ...entry,
@@ -60,7 +60,7 @@ function useMockData() {
       impact,
       delta: `+${baseLift.toFixed(0)} pts projected peak improvement`,
     };
-  };
+  }, []);
 
   return {
     dashboardSummary,

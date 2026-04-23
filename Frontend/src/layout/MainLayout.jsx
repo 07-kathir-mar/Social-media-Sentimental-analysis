@@ -13,7 +13,7 @@ function MainLayout() {
   return (
     <div className="h-screen overflow-hidden bg-app bg-mesh-gradient text-white">
       <div className="mx-auto grid h-full max-w-[1600px] gap-6 px-4 py-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-6 lg:py-6 isolate">
-        <div className="relative z-20">
+        <div className="relative z-50">
           <div className="lg:fixed lg:top-6 lg:w-[280px] lg:max-h-[calc(100vh-3rem)]">
             <Sidebar />
           </div>

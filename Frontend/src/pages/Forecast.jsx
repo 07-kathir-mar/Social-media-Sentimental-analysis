@@ -15,7 +15,6 @@ function TabButton({ active, children, onClick }) {
           ? 'bg-brand-gradient text-slate-950 shadow-lg shadow-orange-500/20'
           : 'border border-white/10 bg-white/5 text-slate-300 hover:border-orange-300/30 hover:text-white'
       }`}
-      style={{ position: 'relative', zIndex: 40, pointerEvents: 'auto' }}
     >
       {children}
     </button>
@@ -114,7 +113,7 @@ function Forecast() {
 
       <div className="min-w-0 flex-1 overflow-y-auto px-2 py-3 pr-3">
         <div className="space-y-6 pb-4">
-          <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 rounded-[24px] bg-app/90 py-2 backdrop-blur-sm">
+          <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-[24px] bg-app/90 py-2 backdrop-blur-sm">
             <TabButton active={activeTab === 'prediction'} onClick={() => setActiveTab('prediction')}>
               Prediction
             </TabButton>
