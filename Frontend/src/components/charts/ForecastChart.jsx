@@ -28,7 +28,7 @@ function ForecastChart({ data, onSelectDay, selectedDay }) {
             interval={2}
             minTickGap={18}
           />
-          <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} domain={[40, 100]} />
+          <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} domain={[0, 100]} />
           <Tooltip
             formatter={(value) => [`${value}`, 'Prediction']}
             labelFormatter={(label) => {

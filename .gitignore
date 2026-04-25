@@ -1,0 +1,17 @@
+# MongoDB data
+Backend/data/
+mongodb-data/
+
+# Python
+**pycache**/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Env
+.env
+
+# Local scratch
+should_be_deleted/

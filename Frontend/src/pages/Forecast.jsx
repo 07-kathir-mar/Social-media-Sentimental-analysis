@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ForecastChart from '../components/charts/ForecastChart';
+import { useBrand } from '../context/BrandContext';
+import useForecast from '../hooks/useForecast';
 import GlassCard from '../components/ui/GlassCard';
 import GradientButton from '../components/ui/GradientButton';
 import SectionTitle from '../components/ui/SectionTitle';
-import useMockData from '../hooks/useMockData';
 
 function TabButton({ active, children, onClick }) {
   return (
@@ -21,30 +22,27 @@ function TabButton({ active, children, onClick }) {
   );
 }
 
-function ExplanationPanel({ point, title }) {
-  if (!point) {
+function ExplanationPanel({ explanation, selectedDay, title }) {
+  if (!explanation?.title) {
     return null;
   }
 
   return (
     <GlassCard hover={false} className="bg-white/[0.045]">
       <p className="text-xs uppercase tracking-[0.3em] text-orange-200/70">{title}</p>
-      <h3 className="mt-4 text-2xl font-semibold text-white">{point.headline}</h3>
-      <p className="mt-3 text-sm text-orange-100/80">
-        {point.fullDate} | {point.sentiment} | Driver: {point.driver}
-      </p>
-      <p className="mt-4 text-sm leading-7 text-slate-300">{point.summary}</p>
-      <div className="mt-6 rounded-[24px] border border-orange-300/20 bg-orange-300/10 p-4 text-sm text-orange-100">
-        Projected delta: {point.delta}
-      </div>
+      <h3 className="mt-4 text-2xl font-semibold text-white">{explanation.title}</h3>
+      {selectedDay ? (
+        <p className="mt-3 text-sm text-orange-100/80">
+          Selected day: {selectedDay.fullDate} | Score: {selectedDay.prediction}
+        </p>
+      ) : null}
+      <p className="mt-4 text-sm leading-7 text-slate-300">{explanation.summary}</p>
       <div className="mt-6 grid gap-3 md:grid-cols-2">
-        {point.topics?.map((topic) => (
-          <div key={`${point.id}-${topic.topic}`} className="rounded-[22px] border border-white/10 bg-black/20 p-4">
-            <p className="text-sm font-semibold text-white">{topic.topic}</p>
-            <p className="mt-2 text-xs uppercase tracking-[0.18em] text-orange-200/70">
-              {topic.sentiment} | {topic.impact}
-            </p>
-            <p className="mt-3 text-sm leading-6 text-slate-300">{topic.summary}</p>
+        {explanation.drivers?.map((driver) => (
+          <div key={driver.name} className="rounded-[22px] border border-white/10 bg-black/20 p-4">
+            <p className="text-sm font-semibold text-white">{driver.name}</p>
+            <p className="mt-2 text-xs uppercase tracking-[0.18em] text-orange-200/70">{driver.impact}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-300">{driver.desc}</p>
           </div>
         ))}
       </div>
@@ -80,36 +78,41 @@ function DaySelector({ data, selectedDay, onSelectDay }) {
 }
 
 function Forecast() {
-  const { forecastPredictions, simulateScenario } = useMockData();
+  const { brand, setBrand } = useBrand();
+  const { forecast, simulation, loading, simulationLoading, runSimulation } = useForecast(brand);
   const [activeTab, setActiveTab] = useState('prediction');
-  const [scenario, setScenario] = useState('');
-  const [hasRunSimulation, setHasRunSimulation] = useState(false);
-
-  const simulation = useMemo(
-    () => simulateScenario(scenario || 'baseline forecast scenario'),
-    [scenario, simulateScenario],
-  );
-
-  const [selectedPredictionDay, setSelectedPredictionDay] = useState(forecastPredictions[0] || null);
-  const [selectedSimulationDay, setSelectedSimulationDay] = useState(simulation.impact[0] || null);
+  const [scenario, setScenario] = useState('delivery_improved');
+  const [selectedPredictionDay, setSelectedPredictionDay] = useState(null);
+  const [selectedSimulationDay, setSelectedSimulationDay] = useState(null);
 
   useEffect(() => {
-    setSelectedPredictionDay(forecastPredictions[0] || null);
-  }, [forecastPredictions]);
+    setSelectedPredictionDay(forecast.graph[0] || null);
+  }, [forecast]);
 
   useEffect(() => {
-    setSelectedSimulationDay(simulation.impact[0] || null);
+    setSelectedSimulationDay(simulation.graph[0] || null);
   }, [simulation]);
-
-  const showRunSimulation = scenario.trim().length > 0;
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col gap-6 overflow-hidden pt-2">
-      <SectionTitle
-        eyebrow="Forecast"
-        title="Monthly forecast"
-        description="Use the tabs to switch between the future prediction view and the what-if simulation flow."
-      />
+      <div className="flex flex-col gap-4 px-2 md:flex-row md:items-end md:justify-between">
+        <SectionTitle
+          eyebrow="Forecast"
+          title="Monthly forecast"
+          description="Use prediction and what-if views to project the next 14 days from sentiment_12h data."
+        />
+        <div className="flex items-center gap-3">
+          <span className="text-xs uppercase tracking-[0.24em] text-slate-400">Brand</span>
+          <select
+            value={brand}
+            onChange={(event) => setBrand(event.target.value)}
+            className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none"
+          >
+            <option value="Nike" className="bg-slate-950">Nike</option>
+            <option value="Adidas" className="bg-slate-950">Adidas</option>
+          </select>
+        </div>
+      </div>
 
       <div className="min-w-0 flex-1 overflow-y-auto px-2 py-3 pr-3">
         <div className="space-y-6 pb-4">
@@ -125,76 +128,84 @@ function Forecast() {
           {activeTab === 'prediction' ? (
             <>
               <GlassCard hover={false} className="relative z-0 overflow-hidden">
-                <ForecastChart
-                  data={forecastPredictions}
-                  selectedDay={selectedPredictionDay}
-                  onSelectDay={setSelectedPredictionDay}
-                />
-                <div className="mt-5">
-                  <DaySelector
-                    data={forecastPredictions}
-                    selectedDay={selectedPredictionDay}
-                    onSelectDay={setSelectedPredictionDay}
-                  />
-                </div>
+                {loading ? (
+                  <p className="text-sm text-slate-300">Loading forecast...</p>
+                ) : forecast.graph.length === 0 ? (
+                  <p className="text-sm text-slate-300">No forecast data available for this brand.</p>
+                ) : (
+                  <>
+                    <ForecastChart
+                      data={forecast.graph}
+                      selectedDay={selectedPredictionDay}
+                      onSelectDay={setSelectedPredictionDay}
+                    />
+                    <div className="mt-5">
+                      <DaySelector
+                        data={forecast.graph}
+                        selectedDay={selectedPredictionDay}
+                        onSelectDay={setSelectedPredictionDay}
+                      />
+                    </div>
+                  </>
+                )}
               </GlassCard>
-              <ExplanationPanel point={selectedPredictionDay} title="Prediction explanation" />
+              <ExplanationPanel
+                explanation={forecast.explanation}
+                selectedDay={selectedPredictionDay}
+                title="Prediction explanation"
+              />
             </>
           ) : (
             <>
               <GlassCard hover={false} className="relative z-0 bg-white/[0.045]">
                 <p className="text-xs uppercase tracking-[0.3em] text-orange-200/70">What-if condition</p>
-                <h3 className="mt-4 text-2xl font-semibold text-white">Enter the simulation description</h3>
+                <h3 className="mt-4 text-2xl font-semibold text-white">Run a deterministic simulation</h3>
                 <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
-                  Add the scenario first. After filling the description, the run simulation button will appear.
+                  Use a scenario name such as <code>delivery_improved</code> to apply a deterministic shift and refresh the forecast line.
                 </p>
-                <textarea
-                  rows="6"
+                <input
                   value={scenario}
-                  onChange={(event) => {
-                    setScenario(event.target.value);
-                    setHasRunSimulation(false);
-                  }}
-                  className="mt-6 w-full rounded-[28px] border border-white/10 bg-black/30 px-5 py-5 text-sm leading-7 text-white outline-none transition duration-300 focus:border-orange-300/40"
-                  placeholder="Describe the what-if condition..."
+                  onChange={(event) => setScenario(event.target.value)}
+                  className="mt-6 w-full rounded-[28px] border border-white/10 bg-black/30 px-5 py-4 text-sm leading-7 text-white outline-none transition duration-300 focus:border-orange-300/40"
+                  placeholder="delivery_improved"
                 />
-
-                {showRunSimulation ? (
-                  <div className="mt-6 flex justify-end">
-                    <GradientButton className="min-w-[220px]" onClick={() => setHasRunSimulation(true)}>
-                      Run simulation
-                    </GradientButton>
-                  </div>
-                ) : null}
+                <div className="mt-6 flex justify-end">
+                  <GradientButton
+                    className="min-w-[220px]"
+                    onClick={() => runSimulation(scenario || 'delivery_improved')}
+                  >
+                    {simulationLoading ? 'Running...' : 'Run simulation'}
+                  </GradientButton>
+                </div>
               </GlassCard>
 
-              {hasRunSimulation ? (
-                <>
-                  <GlassCard hover={false} className="relative z-0">
-                    <p className="text-xs uppercase tracking-[0.3em] text-orange-200/70">Scenario summary</p>
-                    <p className="mt-4 text-sm leading-7 text-slate-300">{scenario}</p>
-                    <div className="mt-4 rounded-[24px] border border-orange-300/20 bg-orange-300/10 p-4 text-sm text-orange-100">
-                      Overall scenario impact: {simulation.delta}
-                    </div>
-                  </GlassCard>
-
-                  <GlassCard hover={false} className="relative z-0 overflow-hidden">
+              <GlassCard hover={false} className="relative z-0 overflow-hidden">
+                {simulationLoading ? (
+                  <p className="text-sm text-slate-300">Running simulation...</p>
+                ) : simulation.graph.length === 0 ? (
+                  <p className="text-sm text-slate-300">Run the simulation to see the updated forecast.</p>
+                ) : (
+                  <>
                     <ForecastChart
-                      data={simulation.impact}
+                      data={simulation.graph}
                       selectedDay={selectedSimulationDay}
                       onSelectDay={setSelectedSimulationDay}
                     />
                     <div className="mt-5">
                       <DaySelector
-                        data={simulation.impact}
+                        data={simulation.graph}
                         selectedDay={selectedSimulationDay}
                         onSelectDay={setSelectedSimulationDay}
                       />
                     </div>
-                  </GlassCard>
-                  <ExplanationPanel point={selectedSimulationDay} title="Simulation explanation" />
-                </>
-              ) : null}
+                  </>
+                )}
+              </GlassCard>
+              <ExplanationPanel
+                explanation={simulation.explanation}
+                selectedDay={selectedSimulationDay}
+                title="Simulation explanation"
+              />
             </>
           )}
         </div>

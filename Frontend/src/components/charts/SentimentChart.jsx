@@ -1,6 +1,13 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 function SentimentChart({ data, onPointSelect, interactive = true, height = '420px' }) {
+  const scores = data.map((item) => Number(item.score)).filter((value) => Number.isFinite(value));
+  const hasCompactRange = scores.length > 0 && scores.every((value) => value >= -1 && value <= 1);
+  const yAxisProps = hasCompactRange
+    ? { domain: [-1, 1], ticks: [-1, -0.5, 0, 0.5, 1] }
+    : { domain: [20, 90], ticks: [20, 35, 50, 65, 80, 90] };
+  const valueSuffix = hasCompactRange ? '' : '/100';
+
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer>
@@ -12,7 +19,7 @@ function SentimentChart({ data, onPointSelect, interactive = true, height = '420
               <stop offset="100%" stopColor="#ef4444" />
             </linearGradient>
           </defs>
-          <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
+          <CartesianGrid stroke="rgba(255,255,255,0.1)" vertical={false} />
           <XAxis
             dataKey="shortLabel"
             stroke="#94a3b8"
@@ -26,8 +33,8 @@ function SentimentChart({ data, onPointSelect, interactive = true, height = '420
             stroke="#94a3b8"
             tickLine={false}
             axisLine={false}
-            domain={[20, 90]}
-            ticks={[20, 35, 50, 65, 80, 90]}
+            domain={yAxisProps.domain}
+            ticks={yAxisProps.ticks}
             tick={{ fontSize: 12 }}
           />
           <Tooltip
@@ -39,30 +46,16 @@ function SentimentChart({ data, onPointSelect, interactive = true, height = '420
               color: '#fff',
               boxShadow: '0 18px 40px rgba(0,0,0,0.3)',
             }}
-            formatter={(value) => [`${value}/100`, 'Sentiment']}
+            formatter={(value) => [`${value}${valueSuffix}`, 'Sentiment']}
             labelFormatter={(_, payload) => payload?.[0]?.payload?.time ?? ''}
           />
           <Line
             type="monotone"
             dataKey="score"
-            stroke="url(#sentimentStroke)"
-            strokeWidth={2.5}
-            dot={{
-              r: interactive ? 1.8 : 0,
-              strokeWidth: 0,
-              fill: '#fb923c',
-            }}
-            activeDot={
-              interactive
-                ? {
-                    r: 5,
-                    strokeWidth: 2,
-                    fill: '#0b0b0f',
-                    stroke: '#facc15',
-                    onClick: (_, payload) => onPointSelect?.(payload?.payload),
-                  }
-                : false
-            }
+            stroke="#f97316"
+            strokeWidth={3}
+            dot={{ r: 5 }}
+            activeDot={{ r: 7 }}
             onClick={interactive ? (payload) => onPointSelect?.(payload?.activePayload?.[0]?.payload) : undefined}
           />
         </LineChart>
