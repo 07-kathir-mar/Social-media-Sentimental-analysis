@@ -5,24 +5,17 @@ import GlassCard from '../components/ui/GlassCard';
 import SectionTitle from '../components/ui/SectionTitle';
 
 function Alerts() {
-  const { brand, setBrand } = useBrand();
+  const { brand } = useBrand();
   const { alerts, loading } = useAlerts(brand);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-6 overflow-hidden pt-2">
       <div className="flex flex-col gap-4 px-2 md:flex-row md:items-end md:justify-between">
-        <SectionTitle eyebrow="Alert system" title="Surface risks and their recent history" />
-        <div className="flex items-center gap-3">
-          <span className="text-xs uppercase tracking-[0.24em] text-slate-400">Brand</span>
-          <select
-            value={brand}
-            onChange={(event) => setBrand(event.target.value)}
-            className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none"
-          >
-            <option value="Nike" className="bg-slate-950">Nike</option>
-            <option value="Adidas" className="bg-slate-950">Adidas</option>
-          </select>
-        </div>
+        <SectionTitle
+          eyebrow="Alert system"
+          title="Surface risks and their recent history"
+          description={`Showing alerts for ${brand}.`}
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-3 pr-3">

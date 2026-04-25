@@ -14,10 +14,8 @@ const topicToneClasses = {
   Negative: 'border-red-300/15 bg-red-400/8 text-red-100',
 };
 
-const brandOptions = ['Nike', 'Adidas'];
-
 function Sentiment() {
-  const { brand, setBrand } = useBrand();
+  const { brand } = useBrand();
   const { graphData, loading, error } = useSentimentData(brand);
   const [selectedPoint, setSelectedPoint] = useState(null);
 
@@ -30,21 +28,11 @@ function Sentiment() {
   return (
     <div className="flex h-full min-h-0 flex-col gap-6 overflow-hidden pt-2">
       <div className="flex flex-col gap-4 px-2 md:flex-row md:items-end md:justify-between">
-        <SectionTitle eyebrow="Sentiment graph" title="Time-based sentiment tracking" />
-        <div className="flex items-center gap-3">
-          <span className="text-xs uppercase tracking-[0.24em] text-slate-400">Brand</span>
-          <select
-            value={brand}
-            onChange={(event) => setBrand(event.target.value)}
-            className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none"
-          >
-            {brandOptions.map((option) => (
-              <option key={option} value={option} className="bg-slate-950">
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SectionTitle
+          eyebrow="Sentiment graph"
+          title="Time-based sentiment tracking"
+          description={`Tracking ${brand} only.`}
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-3 pr-3">
@@ -83,7 +71,7 @@ function Sentiment() {
                   {selectedPoint?.time || 'No time range selected'}
                 </h3>
                 <p className="max-w-3xl text-sm leading-7 text-slate-300">
-                  {selectedPoint?.explanation || 'Select a point in the graph to inspect the backend explanation.'}
+                  {selectedPoint?.explanation || 'Select a point'}
                 </p>
               </div>
               <div className="rounded-[24px] border border-orange-300/12 bg-orange-300/8 px-4 py-3 text-sm text-orange-100">

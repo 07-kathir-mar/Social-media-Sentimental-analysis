@@ -8,7 +8,6 @@ const Sentiment = lazy(() => import('./pages/Sentiment'));
 const PeopleThoughts = lazy(() => import('./pages/PeopleThoughts'));
 const Alerts = lazy(() => import('./pages/Alerts'));
 const Forecast = lazy(() => import('./pages/Forecast'));
-const Compare = lazy(() => import('./pages/Compare'));
 
 function App() {
   return (
@@ -27,7 +26,6 @@ function App() {
           <Route path="/thoughts" element={<PeopleThoughts />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/forecast" element={<Forecast />} />
-          <Route path="/compare" element={<Compare />} />
         </Route>
       </Routes>
     </Suspense>

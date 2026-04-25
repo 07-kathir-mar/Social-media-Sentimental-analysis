@@ -8,10 +8,46 @@ function SentimentChart({ data, onPointSelect, interactive = true, height = '420
     : { domain: [20, 90], ticks: [20, 35, 50, 65, 80, 90] };
   const valueSuffix = hasCompactRange ? '' : '/100';
 
+  function handlePointSelect(dataPoint) {
+    if (dataPoint?.payload) {
+      onPointSelect?.(dataPoint.payload);
+      return;
+    }
+
+    if (dataPoint?.activePayload?.[0]?.payload) {
+      onPointSelect?.(dataPoint.activePayload[0].payload);
+    }
+  }
+
+  function renderActiveDot(props) {
+    const { cx, cy, payload } = props;
+
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={5}
+        fill="#f97316"
+        stroke="#fff7ed"
+        strokeWidth={2}
+        style={{ cursor: interactive ? 'pointer' : 'default' }}
+        onClick={() => {
+          if (interactive) {
+            onPointSelect?.(payload);
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer>
-        <LineChart data={data} margin={{ top: 26, right: 32, left: 12, bottom: 14 }}>
+        <LineChart
+          data={data}
+          margin={{ top: 26, right: 32, left: 12, bottom: 14 }}
+          onClick={interactive ? handlePointSelect : undefined}
+        >
           <defs>
             <linearGradient id="sentimentStroke" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#facc15" />
@@ -54,9 +90,8 @@ function SentimentChart({ data, onPointSelect, interactive = true, height = '420
             dataKey="score"
             stroke="#f97316"
             strokeWidth={3}
-            dot={{ r: 5 }}
-            activeDot={{ r: 7 }}
-            onClick={interactive ? (payload) => onPointSelect?.(payload?.activePayload?.[0]?.payload) : undefined}
+            dot={false}
+            activeDot={renderActiveDot}
           />
         </LineChart>
       </ResponsiveContainer>

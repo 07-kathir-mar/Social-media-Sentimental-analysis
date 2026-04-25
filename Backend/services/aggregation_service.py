@@ -33,15 +33,22 @@ class AggregationService:
             final_scores = [float(comment["final_score"]) for comment in comments]
             avg_score = sum(final_scores) / len(final_scores)
             normalized_score = math.tanh(avg_score / 5)
-            top_comments = [
-                comment["text"]
-                for comment in sorted(
-                    comments,
-                    key=lambda item: abs(float(item["final_score"])),
-                    reverse=True,
-                )[:5]
-            ]
-            explanation = self.explanation_service.get_explanation(top_comments)
+            positive_count = sum(
+                1 for comment in comments if str(comment.get("sentiment", "")).lower() == "positive"
+            )
+            negative_count = sum(
+                1 for comment in comments if str(comment.get("sentiment", "")).lower() == "negative"
+            )
+            neutral_count = sum(
+                1 for comment in comments if str(comment.get("sentiment", "")).lower() == "neutral"
+            )
+
+            if positive_count > negative_count:
+                explanation = "Positive sentiment driven by customer satisfaction and product quality."
+            elif negative_count > positive_count:
+                explanation = "Negative sentiment driven by complaints about delivery or service."
+            else:
+                explanation = "Mixed sentiment with balanced positive and negative feedback."
 
             operations.append(
                 UpdateOne(

@@ -17,7 +17,7 @@ function formatForInput(value) {
 }
 
 function PeopleThoughts() {
-  const { brand, setBrand } = useBrand();
+  const { brand } = useBrand();
   const [activeTab, setActiveTab] = useState('custom');
   const defaultEnd = formatForInput(Date.now());
   const defaultStart = formatForInput(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -49,18 +49,11 @@ function PeopleThoughts() {
   return (
     <div className="flex h-full min-h-0 flex-col gap-6 overflow-hidden pt-2">
       <div className="flex flex-col gap-4 px-2 md:flex-row md:items-end md:justify-between">
-        <SectionTitle eyebrow="Audience reasoning" title="Understand what people think and why" />
-        <div className="flex items-center gap-3">
-          <span className="text-xs uppercase tracking-[0.24em] text-slate-400">Brand</span>
-          <select
-            value={brand}
-            onChange={(event) => setBrand(event.target.value)}
-            className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none"
-          >
-            <option value="Nike" className="bg-slate-950">Nike</option>
-            <option value="Adidas" className="bg-slate-950">Adidas</option>
-          </select>
-        </div>
+        <SectionTitle
+          eyebrow="Audience reasoning"
+          title="Understand what people think and why"
+          description={`Thought analysis is scoped to ${brand}.`}
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 py-3 pr-3">

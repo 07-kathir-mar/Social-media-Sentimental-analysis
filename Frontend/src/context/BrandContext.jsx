@@ -1,9 +1,10 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext } from 'react';
 
 const BrandContext = createContext();
 
 export function BrandProvider({ children }) {
-  const [brand, setBrand] = useState('Nike');
+  const brand = 'Nike';
+  const setBrand = () => {};
 
   return (
     <BrandContext.Provider value={{ brand, setBrand }}>

@@ -7,7 +7,6 @@ const navItems = [
   { to: '/thoughts', label: 'Thoughts' },
   { to: '/alerts', label: 'Alerts' },
   { to: '/forecast', label: 'Forecast' },
-  { to: '/compare', label: 'Compare' },
 ];
 
 function Sidebar() {
@@ -40,7 +39,6 @@ function Sidebar() {
             }
           >
             <span>{item.label}</span>
-            <span className="text-xs opacity-80">01</span>
           </NavLink>
         ))}
       </nav>

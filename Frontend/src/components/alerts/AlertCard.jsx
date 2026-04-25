@@ -62,7 +62,6 @@ function AlertCard({ alert, subtle = false, hover = false, plain = false }) {
 
   return (
     <GlassCard hover={hover} className={`relative overflow-hidden ${cardClass}`}>
-      {!subtle && !plain ? <div className="absolute inset-x-6 top-0 h-px bg-brand-gradient opacity-80" /> : null}
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>

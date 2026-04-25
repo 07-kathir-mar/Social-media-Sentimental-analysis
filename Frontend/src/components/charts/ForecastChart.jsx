@@ -8,9 +8,9 @@ import {
   YAxis,
 } from 'recharts';
 
-function ForecastChart({ data, onSelectDay, selectedDay }) {
+function ForecastChart({ data }) {
   return (
-    <div className="h-80 w-full overflow-hidden pointer-events-none">
+    <div className="h-80 w-full overflow-hidden">
       <ResponsiveContainer>
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
@@ -55,16 +55,14 @@ function ForecastChart({ data, onSelectDay, selectedDay }) {
               strokeWidth: 2,
             }}
             dot={(props) => {
-              const isSelected = props.payload?.id === selectedDay?.id;
-
               return (
                 <circle
                   cx={props.cx}
                   cy={props.cy}
-                  r={isSelected ? 5 : 3}
-                  fill={isSelected ? '#fdba74' : '#fb923c'}
-                  stroke={isSelected ? '#fff7ed' : 'rgba(255,255,255,0.2)'}
-                  strokeWidth={isSelected ? 2 : 1}
+                  r={3}
+                  fill="#fb923c"
+                  stroke="rgba(255,255,255,0.2)"
+                  strokeWidth={1}
                 />
               );
             }}
